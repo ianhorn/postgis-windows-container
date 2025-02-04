@@ -1,0 +1,5 @@
+Dockerfile*
+misc
+README.md
+.gitignore
+.env

@@ -1,16 +1,9 @@
 FROM ianhorn/servercore:ltsc2022-python3.12.8 as base
 
-RUN mkdir Temp
+RUN mkdir /app
 
-WORKDIR /Temp
+COPY . /app
 
-RUN choco install postgresql -y && \
-    curl -L -o postgis-bundle.zip https://download.osgeo.org/postgis/windows/pg17/postgis-bundle-pg17-3.5.2x64.zip && \
-    powershell -Command "Expand-Archive postgis-bundle.zip -DestinationPath postgis-bundle"  && \
-    del postgis-bundle.zip
+FROM ugorsahin/postgis:16.5
 
-# move postgis file
-FROM base as builder
-
-RUN robocopy C:\Temp\postgis-bundle "C:\Program Files\PosgresSQL\17" "*.*" && \
-    rmdir /s /q C:\Temp\postgis-bundle
+RUN pg_restore -U sde -h localhost -d postgis C:\app\backup.dump
