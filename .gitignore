@@ -1,3 +1,7 @@
 misc
 .env
 backup.dump
+
+binaries
+binaries/
+binaries/*
