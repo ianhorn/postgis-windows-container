@@ -1,0 +1,10 @@
+FROM ianhorn/servercore:ltsc2022-python3.12.8 as base
+
+RUN mkdir C:\Temp && \
+    choco install postgresql -y && \
+    curl -L -o C:\Temp\postgis-bundle.exe https://download.osgeo.org/postgis/windows/pg17/postgis-bundle-pg17x64-setup-3.5.2-1.exe  && \
+    SETX PATH "%PATH%;C:\Program Files\PostgreSQL\17\bin" && \
+    SETX PGDATA "C:\Program Files\PostgreSQL\17\data" && \
+    refreshenv && echo "Starting postgis install" && \
+    start /wait C:\Temp\postgis-bundle.exe /NORESTART && \
+    del C:\Temp\postgis-bundle.exe
