@@ -1,15 +1,17 @@
-FROM mcr.microsoft.com/windows/nanoserver:ltsc2022 
+FROM mcr.microsoft.com/windows/servercore:ltsc2022-amd64
 
-# Copy postgresql binaries
-COPY binaries/pgsql .
+# Install Chocolatey
+RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-# Copy postgis binaries
-COPY binaries/postgis352 ./pgsql
+# Install postgresql via chocolatey
+RUN refreshenv && \
+    choco install postgresql && \
+    refreshenv
 
-# add postgres executables to environment path
-ENV PATH=C:/pgsql/bin;%PATH%
+WORKDIR "C:/Program Files/PostgreSQL/17"
+# download postgis binaries and move to posgtresql directory
+RUN powershell -Command "Invoke-WebRequest -Uri "https://download.osgeo.org/postgis/windows/pg17/postgis-bundle-pg17-3.5.2x64.zip -OutFile postgis.zip; `
+    Expand-Archive -Path postgis.zip -DestinationPath 17" && \
+    refreshenv
 
-# # initialize db
-RUN initdb -D C:/pgsql/data
-
-CMD ["pg_ctl", "start", "-D", "C:/pgsql/data"]
+WORKDIR C:/
